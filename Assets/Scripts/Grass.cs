@@ -8,10 +8,23 @@ public class Grass : MonoBehaviour
     public Animator animator;
     public int maxWaitTime = 5;
     public float animationTime = 2f;
+    public float moveSpeed = 1f;
 
     void Start()
     {
         StartCoroutine(moveAfterTime());
+    }
+
+    private void Update()
+    {
+        if(transform.position.x > -10f)
+        {
+            transform.position += Vector3.left * moveSpeed * Time.deltaTime;
+        }
+        else
+        {
+            transform.position = new Vector3(10f, transform.position.y);
+        }
     }
 
     IEnumerator moveAfterTime()
