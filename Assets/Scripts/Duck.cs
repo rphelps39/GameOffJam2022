@@ -13,10 +13,13 @@ public class Duck : MonoBehaviour
     Vector3 targetPosition;
     bool callWalkDuration = true;
     int quadrant;
+    Vector2 difference = Vector2.zero;
+
 
     void Start()
     {
         animator.SetBool("IsWalking", true);
+        animator.speed = 2f;
         targetPosition = GetRandomTargetPosition();
         //randomly pick a time to start moving
         StartCoroutine(moveAfterTime());
@@ -91,4 +94,15 @@ public class Duck : MonoBehaviour
         yield return new WaitForSeconds(wait_time);
         moveAway = true;
     }
+
+    private void OnMouseDown()
+    {
+        difference = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position;
+    }
+
+    private void OnMouseDrag()
+    {
+        transform.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - difference;
+    }
+
 }
