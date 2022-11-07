@@ -98,6 +98,13 @@ public class Duck : MonoBehaviour
     private void OnMouseDown()
     {
         difference = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position;
+
+        //stop walking
+        moveAway = false;
+        animator.SetBool("IsWalking", false);
+
+        //Squirming legs animation?
+        //animator.SetBool("IsSquirming", true);
     }
 
     private void OnMouseDrag()
@@ -105,4 +112,18 @@ public class Duck : MonoBehaviour
         transform.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - difference;
     }
 
+    private void OnMouseUp()
+    {
+        //duck is free agaain, stop squirming
+        //animator.SetBool("IsSquirming", false);
+
+        //calc new random target position
+        targetPosition = GetRandomTargetPosition();
+
+        //allow to move again
+        animator.SetBool("IsWalking", true);
+        moveAway = true;
+        callWalkDuration = true;
+
+    }
 }
