@@ -4,126 +4,175 @@ using UnityEngine;
 
 public class Duck : MonoBehaviour
 {
-
+    //Animator
     public Animator animator;
-    public int maxWaitTime = 5;
+
+    //Time
+    public int maxWaitTime = 6;
+    bool callWalkDuration = true;
+
+    //Move
     bool moveAway = false;
     public float moveSpeed = 1f;
-    public SpriteRenderer sr;
     Vector3 targetPosition;
-    bool callWalkDuration = true;
     int quadrant;
+
+    //Sprite
+    public SpriteRenderer sr;
+    bool shouldFlipX = false;
+
+    //Mouse
     Vector2 difference = Vector2.zero;
 
 
     void Start()
     {
-        animator.SetBool("IsWalking", true);
+        Initialize();
+    }
+
+    void Initialize()
+    {
+        //Small ducks walk a little faster, increase animation speed
         animator.speed = 2f;
+
+        //Get the first random target position
         targetPosition = GetRandomTargetPosition();
-        //randomly pick a time to start moving
-        StartCoroutine(moveAfterTime());
+
+        //On fresh game start, wait at least 3 seconds before moving. Then anytime after that, randomly start moving.
+        StartCoroutine(beginningWaitFor());
     }
 
     void Update()
     {
         if (moveAway)
         {
-            //if allowed to move, move towards target position
+            if (shouldFlipX)
+            {
+                sr.flipX = true;
+                shouldFlipX = false; //Set to false bc we only need this to run once
+            }
+
+            //If allowed to move, move towards target position
             float step = moveSpeed * Time.deltaTime;
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, step);
-            if (callWalkDuration)
-            {
-                StartCoroutine(walkDuration());
-                callWalkDuration = false;
-            }
+
+            //When they start moving, we want them to periodically stop, quack, and resume moving towards a different target position (this adds some variation)
+            //if (callWalkDuration)
+            //{
+            //    StartCoroutine(walkDuration());
+            //}
         }
     }
 
     Vector3 GetRandomTargetPosition()
     {
         quadrant = Random.Range(1, 5);
+        Vector3 tPosition;
 
         switch (quadrant)
         {
             case 1:
                 //top
-                return new Vector3(Random.Range(-10f, 10f), 6f);
+                tPosition =  new Vector3(Random.Range(-10f, 10f), 6f);
+                break;
             case 2:
                 //bottom
-                return new Vector3(Random.Range(-10f, 10f), -6f);
+                tPosition =  new Vector3(Random.Range(-10f, 10f), -6f);
+                break;
             case 3:
                 //left
-                return new Vector3(-10f, Random.Range(-6f, 6f));
+                tPosition =  new Vector3(-10f, Random.Range(-6f, 6f));
+                break;
             case 4:
                 //right
-                return new Vector3(10f, Random.Range(-6f, 6f));
+                tPosition =  new Vector3(10f, Random.Range(-6f, 6f));
+                break;
             default:
                 //default to top for no good reason
-                return new Vector3(Random.Range(-10f, 10f), 6f);
+                tPosition =  new Vector3(Random.Range(-10f, 10f), 6f);
+                break;
         }
+
+        //If the target position x is less than the gameobjects current x, we want to flip the sprite when it starts moving bc its walking to the left
+        if (tPosition.x < transform.position.x)
+        {
+            shouldFlipX = true;
+        }
+
+        return tPosition;
     }
 
     IEnumerator walkDuration()
     {
-        //walk for 2-4 seconds
+        //Don't allow this method to be called again until its complete
+        callWalkDuration = false;
+
+        //Walk for 2-4 seconds
         yield return new WaitForSeconds(Random.Range(2, 5));
 
-        //stop moving
+        //Stop moving
         moveAway = false;
         animator.SetBool("IsWalking", false);
 
-        //wait half a second and quack
+        //Wait half a second and quack
         yield return new WaitForSeconds(0.5f);
         animator.SetBool("IsQuacking", true);
 
-        //let quack animation finish
+        //Let quack animation finish
         yield return new WaitForSeconds(0.5f);
         animator.SetBool("IsQuacking", false);
 
-        //start walking again and repeat cycle
+        //Start walking again
         animator.SetBool("IsWalking", true);
 
+        //Allow to move and call walk duration again
         moveAway = true;
         callWalkDuration = true;
     }
 
-    IEnumerator moveAfterTime()
+    IEnumerator beginningWaitFor()
     {
-        int wait_time = Random.Range(0, maxWaitTime);
+        //After waiting the default 3 seconds, randomly start moving after 0 - maxWaitTime seconds
+        int wait_time = Random.Range(3, maxWaitTime);
         yield return new WaitForSeconds(wait_time);
+
+        //When that time is up, allow movement
         moveAway = true;
     }
 
     private void OnMouseDown()
     {
+        //When mouse is pressed down, find location of mouse press
         difference = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position;
 
-        //stop walking
+        //Stop walking or quacking
         moveAway = false;
         animator.SetBool("IsWalking", false);
+        animator.SetBool("IsQuacking", false);
 
-        //Squirming legs animation?
-        //animator.SetBool("IsSquirming", true);
+        //Squirm indefinitely
+        animator.SetBool("IsSquirming", true);
     }
 
     private void OnMouseDrag()
     {
+        //When dragging, move position of this duck to mouse position
         transform.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - difference;
     }
 
     private void OnMouseUp()
     {
-        //duck is free agaain, stop squirming
-        //animator.SetBool("IsSquirming", false);
+        //On mouse button up, duck is free, stop squirming
+        animator.SetBool("IsSquirming", false);
 
-        //calc new random target position
-        targetPosition = GetRandomTargetPosition();
+        //WANT A NEW LOCATION BUT IT NEEDS TO KINDA BE IN THE SAME DIRECTION
+        //Get a new random target position
+        //targetPosition = GetRandomTargetPosition();
 
-        //allow to move again
-        animator.SetBool("IsWalking", true);
+        //Allow to move again
         moveAway = true;
-        callWalkDuration = true;
+        //callWalkDuration = true;
+        animator.SetBool("IsWalking", true);
 
     }
 }
