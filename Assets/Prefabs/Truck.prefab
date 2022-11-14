@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5944662351040255767}
   - component: {fileID: 8487051639030844851}
   - component: {fileID: 464180283367966684}
+  - component: {fileID: 2958777535869069788}
   m_Layer: 0
   m_Name: Truck
   m_TagString: Untagged
@@ -84,7 +85,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
+  m_MaskInteraction: 1
   m_SpriteSortPoint: 0
 --- !u!61 &8487051639030844851
 BoxCollider2D:
@@ -133,3 +134,16 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &2958777535869069788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5944662351040255764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c5c3da78fa48f54fa0e1787e14962d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 464180283367966684}
